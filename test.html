@@ -1,0 +1,46 @@
+<!-- The following line is essential for the "position: fixed" property to work correctly in IE -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <title>jquery.ui.chatbox</title>
+    <link rel="stylesheet" href="jquery-ui-1.8.2.custom.css" type="text/css" media="screen" />
+    <script type="text/javascript" src="jquery-1.4.2.min.js"></script>
+    <script type="text/javascript" src="jquery-ui-1.8.2.custom.min.js"></script>
+    <link type="text/css" href="jquery.ui.chatbox.css" rel="stylesheet" />
+    <script type="text/javascript" src="jquery.ui.chatbox.js"></script>
+    <script type="text/javascript" src="chatboxManager.js"></script>
+    <script type="text/javascript">
+        var conn;
+        var sendFunc = function(id, msg) {  
+            var g = {"M":msg, "Clientid":id};
+            conn.send(JSON.stringify(g));
+        }
+        chatboxManager.init({messageSent : sendFunc});
+        $(document).ready(function() {
+              conn = new WebSocket("ws://itjobnotification-saga.rhcloud.com:8000/ws");
+              conn.onopen = function(){
+              var authPkt = {"user":"saga.parida@gmail.com","password":"@Sagarika29june"};
+                conn.send(JSON.stringify(authPkt));
+              }
+              conn.onclose  = function(evt) {
+                alert("connection closed");
+              }
+              conn.onmessage = function(evt) {
+                var d = JSON.parse(evt.data);
+                cid = d["Clientid"];
+                chatboxManager.addBox(d["Clientid"], user);
+                chatboxManager.dispatch(d["Clientid"], user, d["M"]);
+              }
+        });
+    </script>
+  </head>
+  <body>
+        <div id="chat_div1">
+    <div id="chat_div2">
+    <div id="chat_div3">
+    </div>
+    <hr />
+    <div id="log">
+    </div>
+  </body>
+</html>
